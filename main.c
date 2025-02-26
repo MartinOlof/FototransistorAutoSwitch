@@ -82,7 +82,7 @@ void setupTimer(){
 
 
 void disableTimer(){
-	TCCR1B |= ((0 << CS10) | (1 << CS11));
+	TCCR1B |= ((0 << CS10) | (0 << CS11));
 }
 
 void turnOn(){
