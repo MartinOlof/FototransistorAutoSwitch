@@ -3,6 +3,7 @@
 #include <avr/interrupt.h>
 #include <stdint.h>
 
+#define F_CPU 1000000UL
 #define ADC_VALUE 93// ADC-värde för 0,1V vid 1,1V referens.
 #define LED_IND_ON PORTB |= (1 << PB4) // LED port PÅ
 #define LED_IND_OFF PORTB &= ~(1 << PB4) // LED port AV
