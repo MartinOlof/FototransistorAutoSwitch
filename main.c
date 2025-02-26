@@ -8,28 +8,43 @@
 #define LED_IND_OFF PORTB &= ~(1 << PB4) // LED port AV
 #define Q_GATE_ON PORTB |= (1 << PB3) // MOSFET Gate PÅ
 #define Q_GATE_OFF PORTB &= ~(1 << PB3) // MOSFET Gate AV
+
 uint16_t adcConvert(); // Funktion för att konvertera adc
 void setupADC(); // Funktion för att starta ADC
-/* 
-TODO:
-Set up timer, with a 3min interval
-Start timer when ADC_VALUE is lower than val
-End timer when 3min is passed and timer hasn't been resetted.
-*/
+void setupTimer();
+void disableTimer();
+void turnOn();
+void turnOff();
+
+
+
 int main(void)
 {
 	setupADC(); // Starta ADC
 	DDRB |= (1 << PB3) | (1 << PB4); // Init portarna för output
+	unsigned char seconds = 0;
 	
     while(1)
     {
 		
 		uint16_t val = adcConvert(); // Lägg värdet i variabeln "val"
-		if(val >= ADC_VALUE){ //Om värdet är större eller mindre än angivna värdet, MOSFET gate och LED startar
-			
+		if(val <= ADC_VALUE){ //Om värdet är mindre eller lika än angivna värdet, MOSFET gate och LED startar
+			setupTimer();
+			turnOn();
+			if(TCNT1 >= 15624){
+				TCNT1 = 0;
+				++sedconds;
+				if(seconds == 190){
+					seconds = 0;
+					turnOff();
+				}
+			}
+			disableTimer();
+			turnOff();
 		}
 		else{
-		
+			disableTimer();
+			turnOff();
 		}
     }
 }
@@ -56,5 +71,27 @@ uint16_t adcConvert(){
 	Ain += AinLow;
 	
 	return Ain; // return digitala värdet
+	
+}
+
+void setupTimer(){
+	TCCR1B |= ((1 << CS10) | (1 << CS11));
+
+}
+
+
+void disableTimer(){
+	TCCR1B |= ((0 << CS10) | (1 << CS11));
+}
+
+void turnOn(){
+	Q_GATE_ON;
+	LED_IND_ON;
+
+}
+
+void turnOff(){
+	Q_GATE_OFF;
+	LED_IND_OFF;
 	
 }
