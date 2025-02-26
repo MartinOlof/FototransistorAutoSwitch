@@ -32,7 +32,7 @@ int main(void)
 		if(val <= ADC_VALUE){ //Om värdet är mindre eller lika än angivna värdet, MOSFET gate och LED startar
 			setupTimer();
 			turnOn();
-			if(TCNT1 >= 15624){
+			if(TCNT1 >= 15624){ // Frekvens 1Hz (ca 1sek)
 				TCNT1 = 0;
 				++sedconds;
 				if(seconds == 190){
@@ -51,10 +51,10 @@ int main(void)
 }
 
 void setupADC(){
-	ADMUX |= (1 << MUX0) | (0 << MUX1) | (0 << MUX2) | (0 << MUX3) | (0 << REFS0) | (1 << REFS1) | (0 << REFS2); //ADC1 (PB2) 
+	ADMUX |= (1 << MUX0) | (0 << MUX1) | (0 << MUX2) | (0 << MUX3); //ADC1 (PB2) 
 	ADCSRA = (1 << ADEN) | (1 << ADIE) | (1 << ADPS0) | (1 << ADPS1) | (1 << ADPS2); //EN ADC, Prescaler 128bit
 	DIDR0 = (1 << ADC1D); // Disable digital input
-	ADMUX |= (0 << REFS0); // Spänningsref Vcc
+	ADMUX |= (0 << REFS0) | (1 << REFS1) | (0 << REFS2) // Spänningsref 1.1V
 	
 	
 }
