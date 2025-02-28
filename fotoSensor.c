@@ -5,7 +5,7 @@
 #include <util/delay.h>
 
 #define F_CPU 1000000UL
-#define ADC_VALUE 93// ADC-värde för 0,1V vid 1,1V referens.
+#define ADC_VALUE 65// ADC-värde för 0,3V vid 5V referens.
 #define LED_IND_ON PORTB |= (1 << PB4) // LED port PÅ
 #define LED_IND_OFF PORTB &= ~(1 << PB4) // LED port AV
 #define Q_GATE_ON PORTB |= (1 << PB3) // MOSFET Gate PÅ
