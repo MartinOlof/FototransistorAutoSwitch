@@ -2,6 +2,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdint.h>
+#include <util/delay.h>
 
 #define F_CPU 1000000UL
 #define ADC_VALUE 93// ADC-värde för 0,1V vid 1,1V referens.
@@ -12,10 +13,8 @@
 
 uint16_t adcConvert(); // Funktion för att konvertera adc
 void setupADC(); // Funktion för att starta ADC
-void setupTimer();
-void disableTimer();
-void turnOn();
-void turnOff();
+void turnOn(); // Starta LED och relä
+void turnOff(); // Stäng av LED och relä
 
 
 
@@ -30,21 +29,11 @@ int main(void)
 		
 		uint16_t val = adcConvert(); // Lägg värdet i variabeln "val"
 		if(val <= ADC_VALUE){ //Om värdet är mindre eller lika än angivna värdet, MOSFET gate och LED startar
-			setupTimer();
 			turnOn();
-			if(TCNT1 >= 15624){ // Frekvens 1Hz (ca 1sek)
-				TCNT1 = 0;
-				++sedconds;
-				if(seconds == 190){
-					seconds = 0;
-					turnOff();
-				}
-			}
-			disableTimer();
+			_delay_ms(30000); // Delay 30sek
 			turnOff();
 		}
-		else{
-			disableTimer();
+	    	else{
 			turnOff();
 		}
     }
@@ -54,7 +43,7 @@ void setupADC(){
 	ADMUX |= (1 << MUX0) | (0 << MUX1) | (0 << MUX2) | (0 << MUX3); //ADC1 (PB2) 
 	ADCSRA = (1 << ADEN) | (1 << ADIE) | (1 << ADPS0) | (1 << ADPS1) | (1 << ADPS2); //EN ADC, Prescaler 128bit
 	DIDR0 = (1 << ADC1D); // Disable digital input
-	ADMUX |= (0 << REFS0) | (1 << REFS1) | (0 << REFS2) // Spänningsref 1.1V
+	ADMUX |= (0 << REFS0); //Spänningsref Vcc
 	
 	
 }
@@ -73,16 +62,6 @@ uint16_t adcConvert(){
 	
 	return Ain; // return digitala värdet
 	
-}
-
-void setupTimer(){
-	TCCR1B |= ((1 << CS10) | (1 << CS11));
-
-}
-
-
-void disableTimer(){
-	TCCR1B |= ((0 << CS10) | (0 << CS11));
 }
 
 void turnOn(){
